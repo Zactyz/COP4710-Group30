@@ -11,6 +11,9 @@ Terminal Actions(I used Visual studio code):
 To check what version of node.js you have
 node -v
 
+
+*******UPDATE************** jUST do: npm intsall and this will install all the npm's from below******************************************
+
 Installed via visual studio code terminal but only if the code gives you an error install, only what you need
 npm i --save nodmon           WILL MOST LIKELY NEED    ******This is how the code runs********** auto runs everytime you save "ctrl + s"
 npm i hbs                              WILL MOST LIKELY NEED
