@@ -1,0 +1,54 @@
+
+
+Download XAMPP (windows)
+-GO TO FOLDER
+-click on "XAMPP-CONTROL"
+-START "APACHE" and "mYsql"
+
+Make sure to install or have node.js installed
+
+Terminal Actions(I used Visual studio code):
+To check what version of node.js you have
+node -v
+
+Installed via visual studio code terminal but only if the code gives you an error install, only what you need
+npm i --save nodmon           WILL MOST LIKELY NEED    ******This is how the code runs********** auto runs everytime you save "ctrl + s"
+npm i hbs                              WILL MOST LIKELY NEED
+npm i bcryptjs
+npm i cookie-parser jsonwebtoken
+npm i express
+npm i dotenv
+npm i mysql                          WILL MOST LIKELY NEED
+
+
+
+
+///// To start the serevr\\\\\\---Might error since you don't have a db
+in the VS terminal enter:
+npm start
+
+
+go to http://localhost:5000/ website should be displayed 
+
+Database setup:
+http://localhost/phpmyadmin
+
+-click new to the left nav
+ database name: nodejs-login
+-click create
+
+make sure spelling is the same, this is a var in the code
+make sure you are the server you just created on the left nav
+ -name is users
+- number of columns 4
+-click go
+
+-make sure spelling is the same, this is a var in the code
+Name       Type                  Length/Value                                    A.I
+id               INT                                                                    "CHECK BOX"
+name        VARCHAR           100
+email        VARCHAR            100
+password  VARCHAR           255
+
+
+CLICK SAVE
