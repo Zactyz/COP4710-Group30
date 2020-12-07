@@ -1,5 +1,5 @@
 const express = require('express');
-
+const authController = require('../controllers/auth');
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -12,6 +12,11 @@ router.get('/register',(req, res) => {
 
 router.get('/login',(req, res) => {
     res.render('login');
+});
+
+router.get('/user', authController.isLoggedIn, authController.getEvents,(req, res) => {
+    console.log(req.userData);
+    //res.render('user');
 });
 
 router.get('/createEvent',(req, res) => {

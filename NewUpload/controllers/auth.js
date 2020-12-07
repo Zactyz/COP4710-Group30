@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
         console.log(results);
         if(!results || !(await bcrypt.compare(password, results[0].password))){
         res.status(401).render('login', {
-            message: ' Email or Password is inccorect'
+            message: ' Email or Password is incorrect'
           })
         } else {
             const id = results[0].id;
@@ -42,8 +42,7 @@ exports.login = async (req, res) => {
             }
 
             res.cookie('jwt', token, cookieOptions);
-
-        res.status(200).redirect("/");
+        res.status(200).redirect("/user");
         }
 
     })
@@ -89,10 +88,37 @@ exports.register = (req, res) => {
 
             }
         })
-
-
-
-
     });
-
 }
+
+
+
+exports.getEvents = (req, res) => {
+    dataBase.query('SELECT * FROM events', async(error, results) => {
+        if(error){
+            console.log(error);
+        }
+        
+        return res.render('user', {
+            events: results
+        })
+    })
+}
+
+
+
+exports.isLoggedIn = (req, res, next) => {
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+        req.userData = decoded;
+        return next();
+    } catch (err) {
+        return res.status(401).send({
+        msg: 'Your session is not valid!'
+        });
+    }
+}
+
