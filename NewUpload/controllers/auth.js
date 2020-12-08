@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
         console.log(results);
         if(!results || !(await bcrypt.compare(password, results[0].password))){
         res.status(401).render('login', {
-            message: ' Email or Password is inccorect'
+            message: ' Email or Password is incorrect'
           })
         } else {
             const id = results[0].id;
@@ -42,8 +42,7 @@ exports.login = async (req, res) => {
             }
 
             res.cookie('jwt', token, cookieOptions);
-
-        res.status(200).redirect("/");
+        res.status(200).redirect("/user");
         }
 
     })
@@ -89,10 +88,137 @@ exports.register = (req, res) => {
 
             }
         })
-
-
-
-
     });
-
 }
+
+
+exports.createEvent = (req, res) => {
+    console.log(req.body);
+
+    const{ title, description, url, start, end, address} = req.body;
+
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.status(401).send({
+        msg: 'Your session is not valid!'
+        });
+    }
+
+    dataBase.query('INSERT INTO events SET ?', {title: title, description: description, url: url, start_date:start, end_date:end, address:address, admin_id: req.userData.id}, (error, results) =>{
+        if(error){
+            console.log(error);
+        } else{
+            console.log(results);
+            return res.render('createEvent', {
+                message: 'Event successfully created'
+            })
+
+        }
+    })
+    
+}
+
+
+exports.getEvents = (req, res) => {
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.status(401).send({
+        msg: 'Your session is not valid!'
+        });
+    }
+    
+    dataBase.query('SELECT * FROM event_participants e, events ev WHERE user_id=? && e.event_id = ev.event_id',[req.userData.id], async(error, results) => {
+        if(error){
+            console.log(error);
+        }
+        
+        return res.render('user', {
+            events: results
+        })
+    })
+}
+
+
+exports.orderByDate = (req, res) => {
+    const{start, end} = req.body;
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.status(401).send({
+        msg: 'Your session is not valid!'
+        });
+    }
+    
+    dataBase.query('SELECT * FROM events e WHERE e.start_date >= ? && e.end_date <= ?',[start, end], async(error, results) => {
+        if(error){
+            console.log(error);
+        }
+        
+        return res.render('events', {
+            events: results,
+            start_def: start,
+            end_def: end
+        })
+    })
+}
+
+
+exports.joinEvent = (req, res) => {
+
+    const{event_id} = req.body;
+
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.status(401).send({
+        msg: 'Your session is not valid!'
+        });
+    }
+    
+    dataBase.query('INSERT INTO event_participants SET ?',{event_id:event_id, user_id: req.userData.id}, async(error, results) => {
+        if(error){
+            return res.render('events', {
+                message: 'You are already participating in this event!'
+            })
+        }
+
+        return res.render('events', {
+            success: 'Successfully added this event!'
+        })
+    })
+}
+
+
+exports.isLoggedIn = (req, res, next) => {
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+        req.userData = decoded;
+        return next();
+    } catch (err) {
+        return res.status(401).send({
+        msg: 'Your session is not valid!'
+        });
+    }
+}
+
