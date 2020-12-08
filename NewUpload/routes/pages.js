@@ -14,7 +14,15 @@ router.get('/login',(req, res) => {
     res.render('login');
 });
 
+router.get('/logout', authController.logout ,(req, res) => {
+});
+
 router.get('/user', authController.isLoggedIn, authController.getEvents,(req, res) => {
+    console.log(req.userData);
+    //res.render('user');
+});
+
+router.get('/admin', authController.isLoggedIn, authController.getEventsByAdmin,(req, res) => {
     console.log(req.userData);
     //res.render('user');
 });

@@ -13,4 +13,8 @@ router.post('/orderByDate', authController.orderByDate);
 
 router.post('/joinEvent', authController.joinEvent);
 
+router.post('/showAllEvents', authController.getEventsByAdmin);
+
+router.post('/showActiveEvents', authController.showActiveEvents);
+
 module.exports = router;

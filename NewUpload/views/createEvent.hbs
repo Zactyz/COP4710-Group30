@@ -11,7 +11,9 @@
     <nav>
         <h4> Exhibition Center Event Website</h4>
         <ul>
-            <li><a href="/">Home</a></li>
+            <li><a href="/admin">Event Hosting</a></li>
+            <li><a href="/events">Join an Event</a></li>
+            <li><a href="/user">My Events</a></li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
@@ -67,5 +69,11 @@
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script>
+        Handlebars.registerHelper('ifeq', function (a, b, options) {
+            if (a == b) { return options.fn(this); }
+            return options.inverse(this);
+        });
+    </script>
 </body>
 </html>
