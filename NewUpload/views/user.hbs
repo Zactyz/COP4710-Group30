@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <nav>
+        <h4> Exhibition Center Event Website</h4>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/logout">Logout</a></li>
+            <li><a href="/events">Events</a></li>
+        </ul>
+    </nav>
+    <h1 style="text-align:center;">Events you are participating in</h1>
+    {{#if events}}
+
+    {{#each events}}
+    <div class="container mt-4">
+    <div class="card">
+            <div class="card-header">
+            {{this.title}}
+            </div>
+            <div class="card-body">
+                Description: {{this.description}}</br>
+                Event Url: {{this.url}}</br>
+                Start Date: {{this.start_date}}</br>
+                End Date: {{this.end_date}}</br>
+                Event Address: {{this.address}}</br>
+            </div>    
+        </div>
+    </div>
+    {{/each}}
+
+    {{else}}
+    <h1 {style="text-align:center;"} >You are not participating in any events</h1>
+    {{/if}}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+</body>
+</html>
