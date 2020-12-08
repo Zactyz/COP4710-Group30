@@ -7,6 +7,6 @@ router.post('/register', authController.register);
 
 router.post('/login', authController.login);
 
-
+router.post('/createEvent', authController.createEvent);
 
 module.exports = router;
