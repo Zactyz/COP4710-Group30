@@ -19,18 +19,22 @@
     <nav>
         <h4> Exhibition Center Event Website</h4>
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/logout">Logout</a></li>
+            <li><a href="/admin">Event Hosting</a></li>
             <li><a href="/createEvent">Create an Event</a></li>
+            <li><a href="/user">My Events</a></li>
+            <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
     <h1 style="text-align:center;">Available Events</h1>
 
     {{#if message}}
-    <h4 class="alert alert-danger mt-4">{{message}}</h4>
+    <h4 class="alert alert-danger mt-4" style="text-align:center;">{{message}}</h4>
     {{/if}}
-    {{#if sucess}}
-    <h4 class="w3-panel w3-green mt-4">{{message}}</h4>
+    {{#if success}}
+    <h4 class="alert alert-success mt-4" style="text-align:center;">{{success}}</h4>
+    {{/if}}
+    {{#if admin}}
+            <h4 class="alert alert-danger mt-4" style="text-align:center;">{{admin}}</h4>
     {{/if}}
 
     <div class="container mt-4" id="flex">
@@ -80,7 +84,7 @@
     {{/each}}
 
     {{else}}
-    <h1 style="text-align:center;">No events available</h1>
+    <h1 style="text-align:center;">No events available in this time period</h1>
     {{/if}}
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 </body>

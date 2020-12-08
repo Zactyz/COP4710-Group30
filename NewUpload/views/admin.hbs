@@ -1,4 +1,12 @@
 <!DOCTYPE html>
+<style>
+
+    #flex {
+    display: flex;
+    display: -webkit-flex;
+    line-height: 30px;
+    }
+</style>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,13 +19,28 @@
     <nav>
         <h4> Exhibition Center Event Website</h4>
         <ul>
-            <li><a href="/admin">Event Hosting</a></li>
+            <li><a href="/user">My Events</a></li>
             <li><a href="/createEvent">Create an Event</a></li>
             <li><a href="/events">Join an Event</a></li>
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
-    <h1 style="text-align:center;">Events you are participating in</h1>
+    <h1 style="text-align:center;">Events you are Hosting</h1>
+
+    <div class="container mt-4" id="flex">
+            {{#if showActive}}
+            <form action="/auth/showAllEvents" method="POST">
+                <button type="submit" class="btn btn-primary">Show All Events</button>
+            </form>
+            {{/if}}
+            {{#if showAll}}
+            <form action="/auth/showActiveEvents" method="POST">
+                <button type="submit" class="btn btn-primary">Show Active Events</button>
+            </form>
+            {{/if}}
+    </div>
+
+    <div>
     {{#if events}}
 
     {{#each events}}
@@ -38,7 +61,7 @@
     {{/each}}
 
     {{else}}
-    <h1 style="text-align:center;" >You are not participating in any events</h1>
+    <h1 style="text-align:center;" >You are not Hosting any Events</h1>
     {{/if}}
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 </body>

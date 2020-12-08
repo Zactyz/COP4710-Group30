@@ -77,7 +77,7 @@ exports.register = (req, res) => {
         let hashedPassword = await bcrypt.hash(password, 8);
         console.log(hashedPassword);
 
-        dataBase.query('INSERT INTO users SET ?', {name: name, email: email, password: hashedPassword}, (error, results) =>{
+        dataBase.query('INSERT INTO users SET ?', {name: name, email: email, password: hashedPassword, role:'User'}, (error, results) =>{
             if(error){
                 console.log(error);
             }else{
@@ -104,11 +104,19 @@ exports.createEvent = (req, res) => {
     );
     req.userData = decoded;
     } catch (err) {
-        return res.status(401).send({
-        msg: 'Your session is not valid!'
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
         });
     }
+    dataBase.query('UPDATE users SET role = "Admin" WHERE users.id=?',[req.userData.id], (error, results) => {
+        if(error){
+            console.log(error);
+        } else{
+            console.log(results);
+        }
 
+    })
+    
     dataBase.query('INSERT INTO events SET ?', {title: title, description: description, url: url, start_date:start, end_date:end, address:address, admin_id: req.userData.id}, (error, results) =>{
         if(error){
             console.log(error);
@@ -132,12 +140,12 @@ exports.getEvents = (req, res) => {
     );
     req.userData = decoded;
     } catch (err) {
-        return res.status(401).send({
-        msg: 'Your session is not valid!'
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
         });
     }
     
-    dataBase.query('SELECT * FROM event_participants e, events ev WHERE user_id=? && e.event_id = ev.event_id',[req.userData.id], async(error, results) => {
+    dataBase.query('SELECT * FROM event_participants e, events ev WHERE user_id=? && e.event_id = ev.event_id ORDER BY ev.start_date',[req.userData.id], async(error, results) => {
         if(error){
             console.log(error);
         }
@@ -147,6 +155,57 @@ exports.getEvents = (req, res) => {
         })
     })
 }
+
+exports.getEventsByAdmin = (req, res) => {
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
+        });
+    }
+    
+    dataBase.query('SELECT * FROM events ev WHERE admin_id=? ORDER BY start_date',[req.userData.id], async(error, results) => {
+        if(error){
+            console.log(error);
+        }
+        
+        return res.render('admin', {
+            events: results,
+            showAll: 'showing all'
+        })
+    })
+}
+
+exports.showActiveEvents = (req, res) => {
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
+        });
+    }
+    var date = new Date()
+    dataBase.query('SELECT * FROM events ev WHERE admin_id=? && end_date>? ORDER BY start_date',[req.userData.id, date], async(error, results) => {
+        if(error){
+            console.log(error);
+        }
+        
+        return res.render('admin', {
+            events: results,
+            showActive: 'showing active'
+        })
+    })
+}
+
 
 
 exports.orderByDate = (req, res) => {
@@ -158,12 +217,12 @@ exports.orderByDate = (req, res) => {
     );
     req.userData = decoded;
     } catch (err) {
-        return res.status(401).send({
-        msg: 'Your session is not valid!'
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
         });
     }
     
-    dataBase.query('SELECT * FROM events e WHERE e.start_date >= ? && e.end_date <= ?',[start, end], async(error, results) => {
+    dataBase.query('SELECT * FROM events e WHERE e.start_date >= ? && e.end_date <= ? ORDER BY e.start_date',[start, end], async(error, results) => {
         if(error){
             console.log(error);
         }
@@ -188,11 +247,20 @@ exports.joinEvent = (req, res) => {
     );
     req.userData = decoded;
     } catch (err) {
-        return res.status(401).send({
-        msg: 'Your session is not valid!'
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
         });
     }
     
+    dataBase.query('SELECT admin_id FROM events e WHERE e.event_id=?',[event_id], async(error, results) => {
+        if(error){
+        }
+        else if(results[0].admin_id == req.userData.id)
+            return res.render('events', {
+                admin: 'You are the host!'
+        })
+    })
+
     dataBase.query('INSERT INTO event_participants SET ?',{event_id:event_id, user_id: req.userData.id}, async(error, results) => {
         if(error){
             return res.render('events', {
@@ -216,9 +284,24 @@ exports.isLoggedIn = (req, res, next) => {
         req.userData = decoded;
         return next();
     } catch (err) {
-        return res.status(401).send({
-        msg: 'Your session is not valid!'
+        return res.render('/', {
+        notLogged: 'Your session is not valid!'
         });
     }
 }
+
+exports.logout = (req, res) => {
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+        // req.cookies.jwt.deleteToken()
+        // console.log(decoded.userData);
+        res.redirect("/");
+    } catch (err) {
+        res.status(400).redirect("/");
+    }
+}
+
 
