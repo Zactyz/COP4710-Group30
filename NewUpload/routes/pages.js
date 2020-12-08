@@ -27,6 +27,11 @@ router.get('/admin', authController.isLoggedIn, authController.getEventsByAdmin,
     //res.render('user');
 });
 
+router.get('/superadmin', authController.isLoggedIn, authController.getAllUsersAndAdmins,(req, res) => {
+    console.log(req.userData);
+    //res.render('user');
+});
+
 router.get('/createEvent',(req, res) => {
     res.render('createEvent');
 });

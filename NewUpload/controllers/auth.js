@@ -28,7 +28,8 @@ exports.login = async (req, res) => {
           })
         } else {
             const id = results[0].id;
-            const token = jwt.sign({id}, process.env.JWT_SECRET, {
+            const role = results[0].role;
+            const token = jwt.sign({id, role}, process.env.JWT_SECRET, {
                 expiresIn: process.env.JWT_EXPIRES_IN
             });
 
@@ -42,7 +43,11 @@ exports.login = async (req, res) => {
             }
 
             res.cookie('jwt', token, cookieOptions);
-        res.status(200).redirect("/user");
+
+            if(results[0].role == 'Super_Admin')
+                res.status(200).redirect("/superadmin");
+            else
+                res.status(200).redirect("/user");
         }
 
     })
@@ -181,6 +186,40 @@ exports.getEventsByAdmin = (req, res) => {
     })
 }
 
+exports.getAllUsersAndAdmins = (req, res) => {
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
+        });
+    }
+    if(req.userData.role != 'Super_Admin'){
+        return res.render('/');
+    }
+    dataBase.query('SELECT * FROM users WHERE role !="Super_Admin"', async(error, results) => {
+        if(error){
+            console.log(error);
+        }
+
+        dataBase.query('SELECT * FROM users WHERE role = "Admin"', async(error, results2) => {
+            if(error){
+                console.log(error);
+            }
+            
+            return res.render('superadmin', {
+                users: results,
+                admins: results2
+            })
+        })
+    })
+}
+
+
 exports.showActiveEvents = (req, res) => {
     try {
         const decoded = jwt.verify(
@@ -235,6 +274,85 @@ exports.orderByDate = (req, res) => {
     })
 }
 
+
+exports.orderByAdmin = (req, res) => {
+    const{admin_id} = req.body;
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
+        });
+    }
+    if(req.userData.role != 'Super_Admin'){
+        return res.render('/');
+    }
+
+    dataBase.query('SELECT * FROM events e, users u WHERE e.admin_id = ? && e.admin_id = u.id',[admin_id], async(error, results1) => {
+        if(error){
+            console.log(error);
+        }
+        dataBase.query('SELECT * FROM users WHERE role !="Super_Admin"', async(error, results2) => {
+    
+            dataBase.query('SELECT * FROM users WHERE role = "Admin"', async(error, results3) => {
+                return res.render('superadmin', {
+                    events: results1,
+                    admins: results3,
+                    users: results2,
+                    name: results1[0].name,
+                    admin: 'admin'
+                })
+            })
+        })
+    })
+}
+
+exports.orderByUser = (req, res) => {
+    const{user_id} = req.body;
+    try {
+        const decoded = jwt.verify(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+    );
+    req.userData = decoded;
+    } catch (err) {
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
+        });
+    }
+    if(req.userData.role != 'Super_Admin'){
+        return res.render('/', {
+            notLogged: 'Your session is not valid!'
+        });
+    }
+    dataBase.query('SELECT * FROM event_participants e, events ev, users u WHERE e.user_id=? && e.event_id = ev.event_id && e.user_id=u.id',[user_id], async(error, results1) => {
+
+        
+        dataBase.query('SELECT * FROM users WHERE role !="Super_Admin"', async(err1, results2) => {
+    
+            dataBase.query('SELECT * FROM users WHERE role = "Admin"', async(err2, results3) => {
+                if(typeof results1[0] == 'undefined'){
+                    return res.render('superadmin', {
+                        admins: results3,
+                        users: results2,
+                    })
+                }
+                else
+                    return res.render('superadmin', {
+                        events: results1,
+                        admins: results3,
+                        users: results2,
+                        name: results1[0].name,
+                        user: 'user'
+                    })
+            })
+        })
+    })
+}
 
 exports.joinEvent = (req, res) => {
 
